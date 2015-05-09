@@ -1,0 +1,181 @@
+% The purpose of this package is for Eliminating Recurrence in Cited Sources
+% According to my own, finnicky conventions!
+%
+% (Author Year, Page)
+%
+% (c) Josh Zaslow
+%
+%% This program can be redistributed and/or modified under the terms
+%% of the LaTeX Project Public License Distributed from CTAN archives
+%% in directory macros/latex/base/lppl.txt.
+%
+
+
+%---- Start of code
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{fussycite}
+  [2015/05/09 v0.6 Package to ]
+
+\RequirePackage{ifthen}
+%Logic Required
+
+
+\newcommand{\lastcite}[1]{\def\@lastcite{#1}}           % Define Required Variables
+\lastcite{}
+
+\newcounter{citenumber}%
+\newcounter{lastcitenumber}%
+
+\setcounter{citenumber}{1}%
+\setcounter{lastcitenumber}{0}%
+
+\newcommand{\increase}[1]{\addtocounter{#1}{1}}%
+\newcommand{\decrease}[1]{\addtocounter{#1}{-1}}%
+
+%---- Special Dewey Citation Style, e.g. LW3: 15 ----
+%---- Define \deweycite Command ----
+    \newcommand{\citedewey}[3][]{%Work, Page
+            \increase{citenumber}%
+            \increase{lastcitenumber}%
+            \label{\arabic{citenumber}}%
+        \ifthenelse{\equal{\pageref{\arabic{citenumber}}}{\pageref{\arabic{lastcitenumber}}}}% Condition
+            {}% Then
+            {\lastcite{}}% Else (Reset Last Citation Information to NULL
+        \ifthenelse{\equal{#2}{\@lastcite}}%    Condition
+            {(#3)}%                 Then
+            {({\scshape\MakeLowercase{#2}}: #3)}%   Else
+        \lastcite{#2}%               zpdate Last Citation to the Present one
+        \increase{citenumber}%
+        \increase{lastcitenumber}%
+        \label{\arabic{citenumber}}%
+%       \nocite{DEWEY-#2#1}}%
+}
+
+%                           Update Recent Citation
+%---- ---- ---- ---- ----
+
+%---- FOR AUTHOR AS Dominant Recurrent Data
+%---- /Define \authorcite Command ----
+        \newcommand{\citeau}[4][Display]{%Display, Author, Year, Page
+            \increase{citenumber}%
+            \increase{lastcitenumber}%
+            \label{\arabic{citenumber}}%
+            \ifthenelse{\equal{\pageref{\arabic{citenumber}}}{\pageref{\arabic{lastcitenumber}}}}% Condition
+                {}% Then
+                {\lastcite{}}% Else (Reset Last Citation Information to NULL
+            \ifthenelse{\equal{#1}{Display}}%           Condition
+                {}%             Then
+                {\lastcite{\rm{\MakeUppercase{AUTHOR{#2}-{#3}}}}}%  Else
+            \ifthenelse{\equal{\rm{\MakeUppercase{AUTHOR{#2}-{#3}}}}{\@lastcite}}%  Condition
+                {(#4)}%                 Then
+                {(#2, #4)}% Else
+            \nocite{\MakeUppercase{#2-#3}}%
+            \lastcite{\rm{\MakeUppercase{AUTHOR{#2}-{#3}}}}%            Update Recent
+            }
+
+%---- For YEAR as Dominant Recurrent Data
+%---- Define \yearcite Command ----
+    \newcommand{\citeyr}[4][Display]{%Display, Author, Year, Page
+        \increase{citenumber}%
+        \increase{lastcitenumber}%
+        \label{\arabic{citenumber}}%
+        \ifthenelse{\equal{\pageref{\arabic{citenumber}}}{\pageref{\arabic{lastcitenumber}}}}% Condition
+            {}% Then
+            {\lastcite{}}% Else (Reset Last Citation Information to NULL
+        \ifthenelse{\equal{#1}{Display}}%           Condition
+            {}%             Then
+            {\lastcite{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}}%    Else
+        \ifthenelse{\equal{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}{\@lastcite}}%    Condition
+            {(#4)}%                 Then
+            {(#3, #4)}% Else
+        \nocite{#2-#3}%
+        \lastcite{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}%              Update Recent
+        }
+%---- ---- ---- ---- ----
+
+%---- YEAR AUTHORas Dominant Recurrent Data
+%----    Drops from author to year ---- % I need to add more options here
+%---- Define \yearauthorcite Command ----
+    \newcommand{\citeauyr}[4][Display]{%Display, Author, Year, Page
+        \increase{citenumber}%
+        \increase{lastcitenumber}%
+        \label{\arabic{citenumber}}%
+        \ifthenelse{\equal{\pageref{\arabic{citenumber}}}{\pageref{\arabic{lastcitenumber}}}}% Condition
+            {}% Then
+            {\lastcite{}}% Else (Reset Last Citation Information to NULL
+        \ifthenelse{\equal{#1}{Display}}%           Condition
+            {}%             Then
+            {\lastcite{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}}%
+            \ifthenelse{\equal{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}{\@lastcite}}%    Condition
+            {\decrease{citenumber}%
+            \decrease{lastcitenumber}%
+            \citeyr{#2}{#3}{#4}}%                   Then
+            {(#2 #3, #4)}%              Else
+        \nocite{#2-#3}%
+        \lastcite{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}%              Update Recent Citation
+        }
+%---- ---- ---- ---- ----
+
+
+%---- FOR AUTHOR AS Dominant Recurrent Data
+%---- /Define \authorcite Command ----
+        \newcommand{\nbciteau}[4][Display]{%Display, Author, Year, Page
+            \increase{citenumber}%
+            \increase{lastcitenumber}%
+            \label{\arabic{citenumber}}%
+            \ifthenelse{\equal{\pageref{\arabic{citenumber}}}{\pageref{\arabic{lastcitenumber}}}}% Condition
+                {}% Then
+                {\lastcite{}}% Else (Reset Last Citation Information to NULL
+            \ifthenelse{\equal{#1}{Display}}%           Condition
+                {}%             Then
+                {\lastcite{\rm{\MakeUppercase{AUTHOR{#2}-{#3}}}}}%  Else
+            \ifthenelse{\equal{\rm{\MakeUppercase{AUTHOR{#2}-{#3}}}}{\@lastcite}}%  Condition
+                {#4}%                   Then
+                {#2, #4}%   Else
+            \nocite{\MakeUppercase{#2-#3}}%
+            \lastcite{\rm{\MakeUppercase{AUTHOR{#2}-{#3}}}}%            Update Recent
+            }
+%---- ---- ---- ---- ----
+
+%---- For YEAR as Dominant Recurrent Data
+%---- Define \yearcite Command ----
+    \newcommand{\nbciteyr}[4][Display]{%Display, Author, Year, Page
+        \increase{citenumber}%
+        \increase{lastcitenumber}%
+        \label{\arabic{citenumber}}%
+        \ifthenelse{\equal{\pageref{\arabic{citenumber}}}{\pageref{\arabic{lastcitenumber}}}}% Condition
+            {}% Then
+            {\lastcite{}}% Else (Reset Last Citation Information to NULL
+        \ifthenelse{\equal{#1}{Display}}%           Condition
+            {}%             Then
+            {\lastcite{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}}%    Else
+        \ifthenelse{\equal{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}{\@lastcite}}%    Condition
+            {#4}%                   Then
+            {#3, #4}%   Else
+        \nocite{#2-#3}%
+        \lastcite{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}%              Update Recent
+        }
+%---- ---- ---- ---- ----
+
+%---- YEAR AUTHORas Dominant Recurrent Data
+%----    Drops from author to year ---- % I need to add more options here
+%---- Define \yearauthorcite Command ----
+    \newcommand{\nbciteauyr}[4][Display]{%Display, Author, Year, Page
+        \increase{citenumber}%
+        \increase{lastcitenumber}%
+        \label{\arabic{citenumber}}%
+        \ifthenelse{\equal{\pageref{\arabic{citenumber}}}{\pageref{\arabic{lastcitenumber}}}}% Condition
+            {}% Then
+            {\lastcite{}}% Else (Reset Last Citation Information to NULL
+        \ifthenelse{\equal{#1}{Display}}%           Condition
+            {}%             Then
+            {\lastcite{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}}%
+            \ifthenelse{\equal{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}{\@lastcite}}%    Condition
+            {\decrease{citenumber}%
+            \decrease{lastcitenumber}%
+            \citeyr{#2}{#3}{#4}}%                   Then
+            {#2 #3, #4}%                Else
+        \nocite{#2-#3}%
+        \lastcite{\rm{\MakeUppercase{YEAR{#2}-{#3}}}}%              Update Recent Citation
+        }
+%---- ---- ---- ---- ----
